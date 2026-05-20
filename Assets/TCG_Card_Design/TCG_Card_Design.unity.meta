@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e1c58d939c8c1394d806b59d1f1e4c82
+timeCreated: 1500387514
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 42367
+  packageName: TCG Card Design
+  packageVersion: 1.2
+  assetPath: Assets/TCG_Card_Design/TCG_Card_Design.unity
+  uploadId: 190603

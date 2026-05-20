@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ee75e942ae1ff0e42a491a8d95ddbaf0
+timeCreated: 1500387489
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 42367
+  packageName: TCG Card Design
+  packageVersion: 1.2
+  assetPath: Assets/TCG_Card_Design/ReadMe.txt
+  uploadId: 190603

@@ -119,6 +119,215 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!21 &186053802
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CardBackFace_Example (Instance) (Instance)
+  m_Shader: {fileID: 4800000, guid: e4d16d58ccf279b4783c32838afca56b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2450
+  stringTagMap:
+    RenderType: TransparentCutout
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 951bdd8b5901b78408ba07d759d7d506, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 83beb99691b78c54497de46a28f5e837, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _CardAspect: 0.667
+    - _CornerRadius: 0.035
+    - _DissolveAmount: 0
+    - _EdgeWidth: 0
+    - _OutlineExpand: 0
+    - _OutlineIntensity: 0
+    - _OutlineSoftness: 0.08
+    - _OutlineWidth: 0.04
+    m_Colors:
+    - _EdgeColor: {r: 1, g: 0.4, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0.85, b: 0.3, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!21 &273010366
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CardParallaxDissolve_Example (Instance) (Instance)
+  m_Shader: {fileID: 4800000, guid: e2916e86918d1224189b47d8dfe99f83, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BGTex:
+        m_Texture: {fileID: 2800000, guid: 7ba4b2810f605d945af87e032ca2957b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BackTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FrameTex:
+        m_Texture: {fileID: 2800000, guid: e6b11acb98009c14a8722af7d74729df, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlazeTex:
+        m_Texture: {fileID: 2800000, guid: e71b40d9faf776148be3ec6eef2f0d35, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: c8121bdf36fc14f4e8a307fff44ac109, type: 3}
+        m_Scale: {x: 1.65, y: 1.65}
+        m_Offset: {x: -0.39, y: -0.7}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 83beb99691b78c54497de46a28f5e837, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BGDepth: -0.03
+    - _CardAspect: 0.75
+    - _CornerRadius: 0.035
+    - _DissolveAmount: 0
+    - _EdgeWidth: 0
+    - _GlazeIntensity: 0
+    - _IsFaceUp: 0
+    - _MainDepth: 0.05
+    - _OutlineExpand: 0.08
+    - _OutlineIntensity: 0
+    - _OutlineSoftness: 0.1
+    - _OutlineWidth: 0.02
+    - _SweepProgress: 1
+    - _TextDepth: 0.02
+    m_Colors:
+    - _EdgeColor: {r: 2, g: 0.5, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0.85, b: 0.3, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!1 &1192350704
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1192350705}
+  - component: {fileID: 1192350708}
+  - component: {fileID: 1192350706}
+  m_Layer: 0
+  m_Name: Halo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1192350705
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192350704}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.001}
+  m_LocalScale: {x: 1.1, y: 1.1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2129259514}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1192350706
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192350704}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 506a78b8a6cd228428b8b8af0a82d80a, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1192350708
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192350704}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1282407582
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,37 +503,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4857da866c0ca84b933ab93cd367fbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardSystem.CardTextSnapshotManager
-  snapshotResolution: 512
+  snapshotWidth: 512
+  snapshotAspect: {x: 3, y: 4}
+  msaaSamples: 4
+  defaultFontAsset: {fileID: 0}
   textFields:
   - key: name
     anchorMin: {x: 0.1, y: 0.33}
     anchorMax: {x: 0.9, y: 0.43}
-    fontSize: 0.1
+    fontSize: 60
     alignment: 514
+    fontStyle: 1
+    characterSpacing: 0
+    lineSpacing: 0
+    fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     tmp: {fileID: 0}
   - key: description
     anchorMin: {x: 0.2, y: 0.1}
     anchorMax: {x: 0.8, y: 0.3}
-    fontSize: 0.06
+    fontSize: 40
     alignment: 514
+    fontStyle: 1
+    characterSpacing: 0
+    lineSpacing: 0
+    fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     tmp: {fileID: 0}
   - key: cost
     anchorMin: {x: 0, y: 0}
     anchorMax: {x: 0.2, y: 0.15}
-    fontSize: 0.07
+    fontSize: 40
     alignment: 514
-    tmp: {fileID: 0}
-  - key: attack
-    anchorMin: {x: 0, y: 0.15}
-    anchorMax: {x: 0.2, y: 0.3}
-    fontSize: 0.07
-    alignment: 514
-    tmp: {fileID: 0}
-  - key: health
-    anchorMin: {x: 0.8, y: 0.15}
-    anchorMax: {x: 1, y: 0.3}
-    fontSize: 0.07
-    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     tmp: {fileID: 0}
   snapshotCamera: {fileID: 0}
   snapshotCanvas: {fileID: 0}
@@ -348,6 +560,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1000000001, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
   m_PrefabInstance: {fileID: 3550343673378417091}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2129259514 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1000000002, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+  m_PrefabInstance: {fileID: 3550343673378417091}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2129259515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,6 +581,8 @@ MonoBehaviour:
   keyFlip: 102
   keyDissolveOn: 100
   keyDissolveOff: 115
+  keyHaloOn: 103
+  keyHaloOff: 104
 --- !u!1001 &3550343673378417091
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -380,9 +599,33 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1000000002, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000002, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: invertTilt
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: mainTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: ba627b1250a185448a3e37c84d082089, type: 3}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: cornerRadius
+      value: 0.035
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: haloRenderer
+      value: 
+      objectReference: {fileID: 1192350706}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: outlineWidth
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: tiltLerpSpeed
@@ -391,6 +634,22 @@ PrefabInstance:
     - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: maxTiltDegrees
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: dissolveStartOn
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: outlineSoftness
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: dissolveDuration
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: outlineOnIntensity
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: dissolveOnEdgeWidth
@@ -436,6 +695,14 @@ PrefabInstance:
       propertyPath: cardData.Array.data[2].color.r
       value: 0.03003788
       objectReference: {fileID: 0}
+    - target: {fileID: 2000000004, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 273010366}
+    - target: {fileID: 3000000002, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.002
+      objectReference: {fileID: 0}
     - target: {fileID: 3000000002, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
@@ -448,6 +715,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3000000004, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 186053802}
     - target: {fileID: 1537057629826629947, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: m_Size.z
       value: 0.1
@@ -558,7 +829,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1000000002, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1192350705}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1000000001, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       insertIndex: -1

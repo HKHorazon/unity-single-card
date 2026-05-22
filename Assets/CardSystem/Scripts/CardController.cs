@@ -22,7 +22,11 @@ namespace CardSystem
     [RequireComponent(typeof(Collider))]
     public class CardController : MonoBehaviour
     {
-        [BoxGroup("Card Data")]
+        [PropertyOrder(-100)]
+        [Button("Refresh All", ButtonSizes.Large), GUIColor(0.4f, 0.9f, 1f)]
+        private void EditorRefreshAll() => RefreshAll();
+
+        [FoldoutGroup("Card Data")]
         [SerializeField, ListDrawerSettings(ShowIndexLabels = false, ListElementLabelName = "key")]
         private List<CardDataEntry> cardData = new List<CardDataEntry>
         {
@@ -31,52 +35,77 @@ namespace CardSystem
             new CardDataEntry { key = "cost",        value = "0"           },
         };
 
-        [BoxGroup("Card Data")]
+        [FoldoutGroup("Card Data")]
         [Button("Apply", ButtonSizes.Medium), PropertyOrder(10)]
         private void EditorApplyCardData() => ApplyCardData();
 
-        [BoxGroup("Card Face")]
+        [FoldoutGroup("Card Face")]
         [SerializeField, LabelText("Front Renderer"), Required] private MeshRenderer frontFace;
-        [BoxGroup("Card Face")]
+        [FoldoutGroup("Card Face")]
         [SerializeField, LabelText("Back Renderer"),  Required] private MeshRenderer backFace;
+        [FoldoutGroup("Card Face")]
+        [SerializeField, LabelText("Halo Renderer"), Tooltip("Optional bigger quad behind card for soft halo (CardHalo shader)")]
+        private MeshRenderer haloRenderer;
 
-        [BoxGroup("Textures")]
+        [FoldoutGroup("Textures")]
         [SerializeField, LabelText("Main"),  PreviewField(60)] private Texture mainTexture;
-        [BoxGroup("Textures")]
+        [FoldoutGroup("Textures")]
         [SerializeField, LabelText("Frame"), PreviewField(60)] private Texture frameTexture;
-        [BoxGroup("Textures")]
+        [FoldoutGroup("Textures")]
         [Button("Apply Textures", ButtonSizes.Medium), PropertyOrder(10)]
         private void EditorApplyTextures() => ApplyTextures();
 
-        [BoxGroup("Tilt")]
+        [FoldoutGroup("Tilt")]
         [SerializeField, LabelText("Max Degrees"), Range(1f, 45f)] private float maxTiltDegrees = 15f;
-        [BoxGroup("Tilt")]
+        [FoldoutGroup("Tilt")]
         [SerializeField, LabelText("Lerp Speed"),  Range(1f, 20f)] private float tiltLerpSpeed  = 8f;
-        [BoxGroup("Tilt")]
+        [FoldoutGroup("Tilt")]
         [SerializeField, LabelText("Invert Tilt"), ToggleLeft]     private bool  invertTilt      = false;
 
-        [BoxGroup("Flip")]
+        [FoldoutGroup("Flip")]
         [SerializeField, LabelText("Duration"), Range(0.1f, 2f)] private float flipDuration = 0.5f;
 
-        [BoxGroup("Dissolve")]
+        [FoldoutGroup("Dissolve")]
         [SerializeField, LabelText("Off Amount"), PropertyRange(0f, 1f)]   private float dissolveOffAmount   = 0f;
-        [BoxGroup("Dissolve")]
+        [FoldoutGroup("Dissolve")]
         [SerializeField, LabelText("On Amount"),  PropertyRange(0f, 1f)]   private float dissolveOnAmount    = 1f;
-        [BoxGroup("Dissolve")]
+        [FoldoutGroup("Dissolve")]
         [SerializeField, LabelText("Edge Width"), PropertyRange(0f, 0.2f)] private float dissolveEdgeWidth   = 0.05f;
-        [BoxGroup("Dissolve")]
+        [FoldoutGroup("Dissolve")]
         [SerializeField, LabelText("Duration"),   Range(0.05f, 5f)]        private float dissolveDuration    = 1f;
-        [BoxGroup("Dissolve")]
+        [FoldoutGroup("Dissolve")]
         [SerializeField, LabelText("Start On"),   ToggleLeft]              private bool  dissolveStartOn     = false;
+
+        [FoldoutGroup("Shape")]
+        [SerializeField, LabelText("Corner Radius"), PropertyRange(0f, 0.5f), Tooltip("Rounded corners. Affects card body AND halo inner shape.")]
+        private float cornerRadius = 0.08f;
+
+        [FoldoutGroup("Halo")]
+        [SerializeField, LabelText("Color"), ColorUsage(true, true)]      private Color haloColor          = new Color(1f, 0.85f, 0.3f, 1f);
+        [FoldoutGroup("Halo")]
+        [SerializeField, LabelText("Off Intensity"), PropertyRange(0f, 10f)] private float haloOffIntensity = 0f;
+        [FoldoutGroup("Halo")]
+        [SerializeField, LabelText("On Intensity"),  PropertyRange(0f, 10f)] private float haloOnIntensity  = 1.5f;
+        [FoldoutGroup("Halo")]
+        [SerializeField, LabelText("Duration"),  Range(0.05f, 5f)]        private float haloDuration       = 0.3f;
+        [FoldoutGroup("Halo")]
+        [SerializeField, LabelText("Start On"),  ToggleLeft]              private bool  haloStartOn        = false;
 
         private static readonly int ID_TextTex        = Shader.PropertyToID("_TextTex");
         private static readonly int ID_DissolveAmount = Shader.PropertyToID("_DissolveAmount");
         private static readonly int ID_EdgeWidth      = Shader.PropertyToID("_EdgeWidth");
         private static readonly int ID_MainTex        = Shader.PropertyToID("_MainTex");
         private static readonly int ID_FrameTex       = Shader.PropertyToID("_FrameTex");
+        private static readonly int ID_CornerRadius     = Shader.PropertyToID("_CornerRadius");
+        private static readonly int ID_CardAspect       = Shader.PropertyToID("_CardAspect");
+        private static readonly int ID_HaloColor        = Shader.PropertyToID("_HaloColor");
+        private static readonly int ID_HaloIntensity    = Shader.PropertyToID("_HaloIntensity");
+        private static readonly int ID_HaloInset        = Shader.PropertyToID("_HaloInset");
+        private static readonly int ID_HaloCornerRadius = Shader.PropertyToID("_HaloCornerRadius");
 
         private Material _frontMat;
         private Material _backMat;
+        private Material _haloMat;
         private Texture2D _snapshotTexture;
 
         private bool _isFaceUp     = true;
@@ -85,6 +114,8 @@ namespace CardSystem
         private int  _activeTweens = 0;
         private bool _dissolveOn   = false;
         private Tweener _dissolveTween;
+        private bool _haloOn       = false;
+        private Tweener _haloTween;
 
         private Quaternion _baseRotation;
         private Camera     _mainCamera;
@@ -93,6 +124,7 @@ namespace CardSystem
         {
             if (frontFace != null) _frontMat = frontFace.material;
             if (backFace  != null) _backMat  = backFace.material;
+            if (haloRenderer != null) _haloMat = haloRenderer.material;
 
             _baseRotation = transform.localRotation;
             _mainCamera   = Camera.main;
@@ -105,6 +137,7 @@ namespace CardSystem
         {
             ApplyTextures();
             ApplyInitialDissolve();
+            ApplyInitialHalo();
             ApplyCardData();
         }
 
@@ -115,11 +148,33 @@ namespace CardSystem
 
             if (_frontMat != null) Destroy(_frontMat);
             if (_backMat  != null) Destroy(_backMat);
+            if (_haloMat  != null) Destroy(_haloMat);
         }
 
         // ── Public API ──────────────────────────────────────────────────
 
         public void RegenerateSnapshot() => ApplyCardData();
+
+        public void RefreshAll()
+        {
+            if (frontFace != null && _frontMat == null) _frontMat = frontFace.material;
+            if (backFace  != null && _backMat  == null) _backMat  = backFace.material;
+
+            if (haloRenderer != null && _haloMat == null) _haloMat = haloRenderer.material;
+
+            ApplyTextures();
+            ApplyHaloStaticParams();
+
+            float dissolveTarget = _dissolveOn ? dissolveOnAmount : dissolveOffAmount;
+            float edge           = dissolveTarget * dissolveEdgeWidth;
+            if (_frontMat != null) { _frontMat.SetFloat(ID_DissolveAmount, dissolveTarget); _frontMat.SetFloat(ID_EdgeWidth, edge); }
+            if (_backMat  != null) { _backMat.SetFloat(ID_DissolveAmount,  dissolveTarget); _backMat.SetFloat(ID_EdgeWidth,  edge); }
+
+            float haloTarget = _haloOn ? haloOnIntensity : haloOffIntensity;
+            if (_haloMat != null) _haloMat.SetFloat(ID_HaloIntensity, haloTarget);
+
+            ApplyCardData();
+        }
 
         public void SetMainTexture (Texture tex) { mainTexture  = tex; ApplyTexture(ID_MainTex,  tex, frontOnly: true); }
         public void SetFrameTexture(Texture tex) { frameTexture = tex; ApplyTexture(ID_FrameTex, tex, frontOnly: false); }
@@ -214,6 +269,88 @@ namespace CardSystem
                 onComplete?.Invoke();
                 TryExitDynamic();
             });
+        }
+
+        public void HaloOn(Action onComplete = null)  => SetHaloState(true,  onComplete);
+        public void HaloOff(Action onComplete = null) => SetHaloState(false, onComplete);
+
+        public void SetHaloState(bool on, Action onComplete = null)
+        {
+            _haloOn = on;
+            float target = on ? haloOnIntensity : haloOffIntensity;
+
+            EnterDynamic();
+
+            if (_haloTween != null)
+            {
+                _haloTween.Kill();
+                _haloTween = null;
+                _activeTweens--;
+            }
+            _activeTweens++;
+
+            ApplyHaloStaticParams();
+            float start = _haloMat != null ? _haloMat.GetFloat(ID_HaloIntensity) : 0f;
+
+            _haloTween = DOTween.To(
+                () => start,
+                v  =>
+                {
+                    if (_haloMat != null) _haloMat.SetFloat(ID_HaloIntensity, v);
+                },
+                target, haloDuration
+            )
+            .SetEase(Ease.OutSine)
+            .OnComplete(() =>
+            {
+                _haloTween = null;
+                _activeTweens--;
+                onComplete?.Invoke();
+                TryExitDynamic();
+            });
+        }
+
+        public void SetHaloIntensity(float value)
+        {
+            if (_haloMat != null) _haloMat.SetFloat(ID_HaloIntensity, value);
+        }
+
+        private void ApplyHaloStaticParams()
+        {
+            ApplyShapeParams();
+            if (_haloMat != null)
+            {
+                _haloMat.SetColor(ID_HaloColor,        haloColor);
+                _haloMat.SetFloat(ID_HaloCornerRadius, cornerRadius);
+                _haloMat.SetFloat(ID_HaloInset,        ComputeHaloInset());
+                float aspect = _frontMat != null && _frontMat.HasProperty(ID_CardAspect) ? _frontMat.GetFloat(ID_CardAspect) : 0.667f;
+                _haloMat.SetFloat(ID_CardAspect, aspect);
+            }
+        }
+
+        private void ApplyShapeParams()
+        {
+            if (_frontMat != null) _frontMat.SetFloat(ID_CornerRadius, cornerRadius);
+            if (_backMat  != null) _backMat.SetFloat(ID_CornerRadius, cornerRadius);
+        }
+
+        private float ComputeHaloInset()
+        {
+            // halo quad is bigger than card; card occupies center fraction of halo UV [inset, 1-inset]
+            if (haloRenderer == null) return 0f;
+            float cardW = transform.lossyScale.x;
+            float haloW = haloRenderer.transform.lossyScale.x;
+            if (haloW <= 0.0001f) return 0f;
+            float frac = cardW / haloW;
+            return Mathf.Clamp((1f - frac) * 0.5f, 0f, 0.45f);
+        }
+
+        private void ApplyInitialHalo()
+        {
+            _haloOn = haloStartOn;
+            float intensity = _haloOn ? haloOnIntensity : haloOffIntensity;
+            ApplyHaloStaticParams();
+            if (_haloMat != null) _haloMat.SetFloat(ID_HaloIntensity, intensity);
         }
 
         private void ApplyInitialDissolve()

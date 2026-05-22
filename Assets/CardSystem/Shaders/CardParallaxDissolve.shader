@@ -21,6 +21,8 @@ Shader "CardSystem/CardParallaxDissolve"
 
         _SweepProgress ("Sweep Progress", Range(0,1)) = 0
         _GlazeIntensity ("Glaze Intensity", Range(0,2)) = 1
+
+        _CornerRadius ("Corner Radius", Range(0, 0.5)) = 0.08
     }
 
     SubShader
@@ -85,6 +87,7 @@ Shader "CardSystem/CardParallaxDissolve"
                 float4 _EdgeColor;
                 float  _SweepProgress;
                 float  _GlazeIntensity;
+                float  _CornerRadius;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -115,6 +118,18 @@ Shader "CardSystem/CardParallaxDissolve"
             {
                 float2 uv = IN.uv;
 
+                // rounded-rect SDF on full mesh UV (no outline ring)
+                float aspect = max(_CardAspect, 0.0001);
+                float2 p     = uv - 0.5;
+                float2 p_w   = float2(p.x * aspect, p.y);
+                float2 innerHalf_w = float2(0.5 * aspect, 0.5);
+                float r      = min(_CornerRadius, min(innerHalf_w.x, innerHalf_w.y));
+                float2 dd    = abs(p_w) - innerHalf_w + r;
+                float dist   = length(max(dd, 0)) + min(max(dd.x, dd.y), 0) - r;
+                if (dist > 0) clip(-1);
+
+                float2 cardUv = uv;
+
                 float2 parallaxOffset = float2(0, 0);
                 #if defined(PARALLAX_ON)
                 float3 viewDirTS = normalize(IN.viewDirTS);
@@ -122,53 +137,53 @@ Shader "CardSystem/CardParallaxDissolve"
                 parallaxOffset = viewDirTS.xy / vz;
                 #endif
 
-                // correct UV for card aspect ratio so square images don't stretch
-                // card is W:H = _CardAspect (e.g. 0.75 for 3x4), UV.y needs scaling
-                float2 uv_corrected = float2(uv.x, (uv.y - 0.5) / _CardAspect + 0.5);
+                half4 color = half4(0, 0, 0, 0);
 
-                float2 uv_frame    = uv;
-                float2 uv_main_st  = TRANSFORM_TEX(uv_corrected, _MainTex);
-                float2 uv_main     = uv_main_st + parallaxOffset * _MainDepth;
-                float2 uv_bg       = TRANSFORM_TEX(uv_corrected, _BGTex) + parallaxOffset * _BGDepth;
-                // TMP 已在 1x1 canvas 排版，直接用原 uv 採樣即可
-                float2 uv_text     = uv + parallaxOffset * _TextDepth;
-
-                half4 bgCol    = SAMPLE_TEXTURE2D(_BGTex,    sampler_BGTex,    uv_bg);
-                half4 mainCol  = SAMPLE_TEXTURE2D(_MainTex,  sampler_MainTex,  uv_main);
-                // hide pixels outside ST-transformed UV bounds to prevent repeat/wrap artifacts
-                bool mainInBounds = uv_main_st.x >= 0 && uv_main_st.x <= 1 &&
-                                    uv_main_st.y >= 0 && uv_main_st.y <= 1;
-                mainCol.a *= mainInBounds ? 1.0 : 0.0;
-                half4 frameCol = SAMPLE_TEXTURE2D(_FrameTex, sampler_FrameTex, uv_frame);
-                half4 textCol  = SAMPLE_TEXTURE2D(_TextTex,  sampler_TextTex,  uv_text);
-                // 超出 [0,1] → 視為透明，避免邊界 wrap 出現殘影
-                bool textInBounds = uv_text.x >= 0 && uv_text.x <= 1 &&
-                                    uv_text.y >= 0 && uv_text.y <= 1;
-                textCol.a *= textInBounds ? 1.0 : 0.0;
-
-                // alpha-over composite: BG -> Main -> Frame -> Text
-                half4 color = bgCol;
-                color.rgb = lerp(color.rgb, mainCol.rgb, mainCol.a);
-                color.rgb = lerp(color.rgb, frameCol.rgb, frameCol.a);
-                color.rgb = lerp(color.rgb, textCol.rgb, textCol.a);
-
-                float2 uv_glaze = uv * _GlazeTex_ST.xy + _GlazeTex_ST.zw;
-                #if defined(PARALLAX_ON)
-                uv_glaze += viewDirTS.xy * 0.5 + _SweepProgress;
-                #else
-                uv_glaze += _SweepProgress;
-                #endif
-                half4 glazeCol = SAMPLE_TEXTURE2D(_GlazeTex, sampler_GlazeTex, uv_glaze);
-                color.rgb += glazeCol.rgb * glazeCol.a * _GlazeIntensity;
-
-                half noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, uv).r;
-                float edge = _DissolveAmount + _EdgeWidth;
-                if (noise < edge && noise >= _DissolveAmount)
+                // card content compositing using cardUv
                 {
-                    float t = 1.0 - (noise - _DissolveAmount) / max(_EdgeWidth, 0.0001);
-                    color.rgb += _EdgeColor.rgb * t;
+                    float2 uv_corrected = float2(cardUv.x, (cardUv.y - 0.5) / _CardAspect + 0.5);
+
+                    float2 uv_frame    = cardUv;
+                    float2 uv_main_st  = TRANSFORM_TEX(uv_corrected, _MainTex);
+                    float2 uv_main     = uv_main_st + parallaxOffset * _MainDepth;
+                    float2 uv_bg       = TRANSFORM_TEX(uv_corrected, _BGTex) + parallaxOffset * _BGDepth;
+                    float2 uv_text     = cardUv + parallaxOffset * _TextDepth;
+
+                    half4 bgCol    = SAMPLE_TEXTURE2D(_BGTex,    sampler_BGTex,    uv_bg);
+                    half4 mainCol  = SAMPLE_TEXTURE2D(_MainTex,  sampler_MainTex,  uv_main);
+                    bool mainInBounds = uv_main_st.x >= 0 && uv_main_st.x <= 1 &&
+                                        uv_main_st.y >= 0 && uv_main_st.y <= 1;
+                    mainCol.a *= mainInBounds ? 1.0 : 0.0;
+                    half4 frameCol = SAMPLE_TEXTURE2D(_FrameTex, sampler_FrameTex, uv_frame);
+                    half4 textCol  = SAMPLE_TEXTURE2D(_TextTex,  sampler_TextTex,  uv_text);
+                    bool textInBounds = uv_text.x >= 0 && uv_text.x <= 1 &&
+                                        uv_text.y >= 0 && uv_text.y <= 1;
+                    textCol.a *= textInBounds ? 1.0 : 0.0;
+
+                    color = bgCol;
+                    color.rgb = lerp(color.rgb, mainCol.rgb,  mainCol.a);
+                    color.rgb = lerp(color.rgb, frameCol.rgb, frameCol.a);
+                    color.rgb = lerp(color.rgb, textCol.rgb,  textCol.a);
+
+                    float2 uv_glaze = cardUv * _GlazeTex_ST.xy + _GlazeTex_ST.zw;
+                    #if defined(PARALLAX_ON)
+                    uv_glaze += viewDirTS.xy * 0.5 + _SweepProgress;
+                    #else
+                    uv_glaze += _SweepProgress;
+                    #endif
+                    half4 glazeCol = SAMPLE_TEXTURE2D(_GlazeTex, sampler_GlazeTex, uv_glaze);
+                    color.rgb += glazeCol.rgb * glazeCol.a * _GlazeIntensity;
+
+                    half noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, cardUv).r;
+                    float burn = _DissolveAmount + _EdgeWidth;
+                    if (noise < burn && noise >= _DissolveAmount)
+                    {
+                        float t = 1.0 - (noise - _DissolveAmount) / max(_EdgeWidth, 0.0001);
+                        color.rgb += _EdgeColor.rgb * t;
+                    }
+                    clip(noise - _DissolveAmount);
+                    color.a = 1.0;
                 }
-                clip(noise - _DissolveAmount);
 
                 return color;
             }

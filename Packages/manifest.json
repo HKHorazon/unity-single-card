@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.besty.unity-skills": "https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity",
+    "com.unity.2d.psdimporter": "12.0.2",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.12",
     "com.unity.collab-proxy": "2.12.4",

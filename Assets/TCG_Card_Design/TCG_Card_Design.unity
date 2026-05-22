@@ -343,6 +343,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2129259511 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1000000001, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+  m_PrefabInstance: {fileID: 3550343673378417091}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2129259515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2129259511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23a7158386b10b948a58435f257d519b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardSystem.CardControllerTester
+  clickToFlipEnabled: 1
+  keyFlip: 102
+  keyDissolveOn: 100
+  keyDissolveOff: 115
 --- !u!1001 &3550343673378417091
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -370,6 +391,14 @@ PrefabInstance:
     - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: maxTiltDegrees
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: dissolveOnEdgeWidth
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      propertyPath: dissolveOffEdgeWidth
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1000000003, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
       propertyPath: cardData.Array.data[0].color.b
@@ -530,7 +559,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1000000001, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2129259515}
   m_SourcePrefab: {fileID: 100100000, guid: 8645ed1d6639d024d856b0e81bd4edb5, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

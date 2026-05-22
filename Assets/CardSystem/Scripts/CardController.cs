@@ -40,6 +40,14 @@ namespace CardSystem
         [BoxGroup("Card Face")]
         [SerializeField, LabelText("Back Renderer"),  Required] private MeshRenderer backFace;
 
+        [BoxGroup("Textures")]
+        [SerializeField, LabelText("Main"),  PreviewField(60)] private Texture mainTexture;
+        [BoxGroup("Textures")]
+        [SerializeField, LabelText("Frame"), PreviewField(60)] private Texture frameTexture;
+        [BoxGroup("Textures")]
+        [Button("Apply Textures", ButtonSizes.Medium), PropertyOrder(10)]
+        private void EditorApplyTextures() => ApplyTextures();
+
         [BoxGroup("Tilt")]
         [SerializeField, LabelText("Max Degrees"), Range(1f, 45f)] private float maxTiltDegrees = 15f;
         [BoxGroup("Tilt")]
@@ -47,9 +55,25 @@ namespace CardSystem
         [BoxGroup("Tilt")]
         [SerializeField, LabelText("Invert Tilt"), ToggleLeft]     private bool  invertTilt      = false;
 
+        [BoxGroup("Flip")]
+        [SerializeField, LabelText("Duration"), Range(0.1f, 2f)] private float flipDuration = 0.5f;
+
+        [BoxGroup("Dissolve")]
+        [SerializeField, LabelText("Off Amount"), PropertyRange(0f, 1f)]   private float dissolveOffAmount   = 0f;
+        [BoxGroup("Dissolve")]
+        [SerializeField, LabelText("On Amount"),  PropertyRange(0f, 1f)]   private float dissolveOnAmount    = 1f;
+        [BoxGroup("Dissolve")]
+        [SerializeField, LabelText("Edge Width"), PropertyRange(0f, 0.2f)] private float dissolveEdgeWidth   = 0.05f;
+        [BoxGroup("Dissolve")]
+        [SerializeField, LabelText("Duration"),   Range(0.05f, 5f)]        private float dissolveDuration    = 1f;
+        [BoxGroup("Dissolve")]
+        [SerializeField, LabelText("Start On"),   ToggleLeft]              private bool  dissolveStartOn     = false;
+
         private static readonly int ID_TextTex        = Shader.PropertyToID("_TextTex");
         private static readonly int ID_DissolveAmount = Shader.PropertyToID("_DissolveAmount");
         private static readonly int ID_EdgeWidth      = Shader.PropertyToID("_EdgeWidth");
+        private static readonly int ID_MainTex        = Shader.PropertyToID("_MainTex");
+        private static readonly int ID_FrameTex       = Shader.PropertyToID("_FrameTex");
 
         private Material _frontMat;
         private Material _backMat;
@@ -59,6 +83,8 @@ namespace CardSystem
         private int  _flipCount    = 0;
         private bool _isDynamic    = false;
         private int  _activeTweens = 0;
+        private bool _dissolveOn   = false;
+        private Tweener _dissolveTween;
 
         private Quaternion _baseRotation;
         private Camera     _mainCamera;
@@ -77,6 +103,8 @@ namespace CardSystem
 
         private void Start()
         {
+            ApplyTextures();
+            ApplyInitialDissolve();
             ApplyCardData();
         }
 
@@ -93,6 +121,22 @@ namespace CardSystem
 
         public void RegenerateSnapshot() => ApplyCardData();
 
+        public void SetMainTexture (Texture tex) { mainTexture  = tex; ApplyTexture(ID_MainTex,  tex, frontOnly: true); }
+        public void SetFrameTexture(Texture tex) { frameTexture = tex; ApplyTexture(ID_FrameTex, tex, frontOnly: false); }
+
+        private void ApplyTextures()
+        {
+            ApplyTexture(ID_MainTex,  mainTexture,  frontOnly: true);
+            ApplyTexture(ID_FrameTex, frameTexture, frontOnly: false);
+        }
+
+        private void ApplyTexture(int id, Texture tex, bool frontOnly)
+        {
+            if (tex == null) return;
+            if (_frontMat != null) _frontMat.SetTexture(id, tex);
+            if (!frontOnly && _backMat != null) _backMat.SetTexture(id, tex);
+        }
+
         public void SetCardData(Dictionary<string, string> values)
         {
             cardData.Clear();
@@ -101,9 +145,7 @@ namespace CardSystem
             ApplyCardData();
         }
 
-        [BoxGroup("Actions")]
-        [Button("Flip", ButtonSizes.Medium)]
-        public void Flip(float duration = 0.5f)
+        public void Flip()
         {
             if (_activeTweens > 0) return;
             if (_exitTween != null)
@@ -118,7 +160,7 @@ namespace CardSystem
             _flipCount++;
 
             const float settleTime = 0.05f;
-            float flipTime = Mathf.Max(0.01f, duration - settleTime);
+            float flipTime = Mathf.Max(0.01f, flipDuration - settleTime);
 
             DOTween.Sequence()
                 .Append(transform.DOLocalRotateQuaternion(_baseRotation, settleTime).SetEase(Ease.OutSine))
@@ -133,48 +175,54 @@ namespace CardSystem
                 });
         }
 
-        [BoxGroup("Actions")]
-        [Button("Set Dissolve", ButtonSizes.Medium)]
-        public void SetDissolve(
-            [PropertyRange(0f, 1f)] float amount,
-            [PropertyRange(0f, 0.2f)] float width = 0.05f)
-        {
-            if (_frontMat != null)
-            {
-                _frontMat.SetFloat(ID_DissolveAmount, amount);
-                _frontMat.SetFloat(ID_EdgeWidth,      width);
-            }
-            if (_backMat != null)
-            {
-                _backMat.SetFloat(ID_DissolveAmount, amount);
-                _backMat.SetFloat(ID_EdgeWidth,      width);
-            }
-        }
+        public void DissolveOn(Action onComplete = null)  => SetDissolveState(true,  onComplete);
+        public void DissolveOff(Action onComplete = null) => SetDissolveState(false, onComplete);
 
-        public void PlayDissolve(float duration, Action onComplete = null)
+        public void SetDissolveState(bool on, Action onComplete = null)
         {
+            _dissolveOn = on;
+            float targetAmount = on ? dissolveOnAmount : dissolveOffAmount;
+
             EnterDynamic();
+
+            if (_dissolveTween != null)
+            {
+                _dissolveTween.Kill();
+                _dissolveTween = null;
+                _activeTweens--;
+            }
             _activeTweens++;
 
-            if (_frontMat != null) _frontMat.SetFloat(ID_DissolveAmount, 0f);
-            if (_backMat  != null) _backMat.SetFloat(ID_DissolveAmount, 0f);
+            float startAmount = _frontMat != null ? _frontMat.GetFloat(ID_DissolveAmount) : 0f;
 
-            DOTween.To(
-                () => _frontMat != null ? _frontMat.GetFloat(ID_DissolveAmount) : 0f,
-                v  =>
+            _dissolveTween = DOTween.To(
+                () => 0f,
+                t  =>
                 {
-                    if (_frontMat != null) _frontMat.SetFloat(ID_DissolveAmount, v);
-                    if (_backMat  != null) _backMat.SetFloat(ID_DissolveAmount, v);
+                    float a = Mathf.Lerp(startAmount, targetAmount, t);
+                    float e = a * dissolveEdgeWidth;
+                    if (_frontMat != null) { _frontMat.SetFloat(ID_DissolveAmount, a); _frontMat.SetFloat(ID_EdgeWidth, e); }
+                    if (_backMat  != null) { _backMat.SetFloat(ID_DissolveAmount,  a); _backMat.SetFloat(ID_EdgeWidth,  e); }
                 },
-                1f, duration
+                1f, dissolveDuration
             )
             .SetEase(Ease.Linear)
             .OnComplete(() =>
             {
+                _dissolveTween = null;
                 _activeTweens--;
                 onComplete?.Invoke();
                 TryExitDynamic();
             });
+        }
+
+        private void ApplyInitialDissolve()
+        {
+            _dissolveOn = dissolveStartOn;
+            float amount = _dissolveOn ? dissolveOnAmount : dissolveOffAmount;
+            float edge   = amount * dissolveEdgeWidth;
+            if (_frontMat != null) { _frontMat.SetFloat(ID_DissolveAmount, amount); _frontMat.SetFloat(ID_EdgeWidth, edge); }
+            if (_backMat  != null) { _backMat.SetFloat(ID_DissolveAmount,  amount); _backMat.SetFloat(ID_EdgeWidth,  edge); }
         }
 
         // ── Mouse Hover ───────────────────────────────────────────────
@@ -191,9 +239,6 @@ namespace CardSystem
             RaycastHit hitInfo = default;
             foreach (var h in Physics.RaycastAll(ray, 100f))
                 if (h.transform == transform) { hit = true; hitInfo = h; break; }
-
-            if (hit && Input.GetMouseButtonDown(0))
-                Flip();
 
             if (hit && !_isHovering)
             {

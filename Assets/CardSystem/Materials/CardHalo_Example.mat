@@ -28,9 +28,9 @@ Material:
     - _CardAspect: 0.43
     - _HaloCornerRadius: 0.215
     - _HaloInset: 0.0881
-    - _HaloIntensity: 1.47
-    - _HaloPower: 1.286
-    - _HaloSpread: 0.166
+    - _HaloIntensity: 1
+    - _HaloPower: 4
+    - _HaloSpread: 0.02
     m_Colors:
     - _HaloColor: {r: 1, g: 0.85, b: 0.3, a: 1}
   m_BuildTextureStacks: []
